@@ -1,0 +1,44 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  name:  Default
+
+steps:
+- checkout: self
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    projects: '**/*.csproj'
+    arguments: '--configuration Release --output $(Build.SourcesDirectory)\publish /p:DeployOnBuild=false /p:WebPublishMethod=FileSystem /p:DeleteExistingFiles=true'
+    modifyOutputPath: false
+  displayName: 'Build the c# project'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)\publish'
+    TargetFolder: 'C:\inetpub\wwwroot\c_sharp'   # ⚠️ Change this to your IIS site folder path
+    OverWrite: true
+  displayName: 'Copy files to IIS site folder'
+
+- powershell: |
+    Write-Host "Stopping IIS..."
+    iisreset /stop
+    Write-Host "Extracting publish.zip to IIS folder..."
+    Expand-Archive -Path "C:\inetpub\wwwroot\c_sharp\publish.zip" -DestinationPath "C:\inetpub\wwwroot\c_sharp" -Force
+    Remove-Item "C:\inetpub\wwwroot\c_sharp\publish.zip" -Force
+  displayName: 'unziped the file'
+
+# Step 4 — Restart IIS
+- script: |
+    echo Restarting IIS...
+    iisreset /restart
+  displayName: 'Restart IIS'
+  
