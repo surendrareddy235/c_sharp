@@ -1,4 +1,6 @@
-trigger: main
+trigger:
+    branches:
+        - main
 
 pool:
     vmImage : 'Azure Pipelines'
