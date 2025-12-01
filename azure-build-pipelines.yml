@@ -36,11 +36,15 @@ steps:
         publishWebProjects: true
         arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         
-    - task: PublishPipelineArtifact@1
-      displayName: 'Publish Artifacts'
-      inputs: 
-        targetPath: '$(Build.ArtifactStagingDirectory)'
-        artifact: 'drop'
+    - task: ArchiveFiles@2
+      displayName: 'Create ZIP package'
+      inputs:
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/drop.zip'
+          replaceExistingArchive: true
+
 
 
 
