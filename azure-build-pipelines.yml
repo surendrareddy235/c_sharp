@@ -1,61 +1,53 @@
-trigger:
+﻿trigger:
   branches:
     include:
       - main
 
 pool:
-    vmImage : 'windows-latest'
-    
+  vmImage: 'windows-latest'
+
 variables:
-    solution: '**/*.sln'
-    Buildplatform: 'Any CPU'
-    buildConfiguration: 'Release'
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
 
 steps:
-    - checkout: self
-      clean: true
+- checkout: self
+  clean: true
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Restore Packages'
-      inputs: 
-        command: 'restore'
-        projects: '$(solution)' 
-  
-     
-    - task: DotNetCoreCLI@2
-      displayName: 'Build Solution'
-      inputs:
-        command: 'build'
-        projects: '$(solution)'
-        arguments: '--configuration $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  displayName: 'Restore Packages'
+  inputs:
+    command: 'restore'
+    projects: '$(solution)'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'publish artifacts'
-      inputs:
-        command: 'publish'
-        publishWebProjects: true
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-        
+- task: DotNetCoreCLI@2
+  displayName: 'Build Solution'
+  inputs:
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '--configuration $(buildConfiguration)'
 
-    - task: ArchiveFiles@2
-      displayName: 'Create ZIP package'
-      inputs:
-          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
-          includeRootFolder: false
-          archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/drop.zip'
-          replaceExistingArchive: true
+# ❗ REMOVED publishWebProjects: true (this was creating s.zip)
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Web Project'
+  inputs:
+    command: 'publish'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish drop artifact'
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+- task: ArchiveFiles@2
+  displayName: 'Create ZIP package'
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/drop.zip'
+    replaceExistingArchive: true
 
-
-
-
-
-
-       
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish drop artifact'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
