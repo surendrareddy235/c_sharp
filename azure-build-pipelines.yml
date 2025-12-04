@@ -28,18 +28,19 @@ steps:
     projects: '$(solution)'
     arguments: '--configuration $(buildConfiguration)'
 
-# ❗ REMOVED publishWebProjects: true (this was creating s.zip)
+# FIXED PUBLISH LOCATION (IMPORTANT)
 - task: DotNetCoreCLI@2
   displayName: 'Publish Web Project'
   inputs:
     command: 'publish'
     projects: '**/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish'
 
+# ZIP ONLY THE PUBLISHED OUTPUT
 - task: ArchiveFiles@2
   displayName: 'Create ZIP package'
   inputs:
-    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/drop.zip'
