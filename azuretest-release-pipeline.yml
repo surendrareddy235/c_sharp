@@ -5,9 +5,9 @@ pr: none
 # Trigger this release automatically when the build pipeline finishes
 resources:
   pipelines:
-  - pipeline: buildPipeline        # alias (you can name anything)
-    source: build  # EXACT name of your build pipeline
-    trigger: true
+  - pipeline: buildPipeline        # alias
+    source: build                  # EXACT name of your build pipeline
+    trigger: true                  # auto-trigger release after build completes
 
 stages:
 - stage: TestDeploy
@@ -17,7 +17,7 @@ stages:
     displayName: "Deploy to Test IIS Server"
     pool:
       name: 'Default'              # Your VM agent pool
-    environment: 'Test'            # Your Environment name
+    environment: 'Test'
     strategy:
       runOnce:
         deploy:
@@ -26,10 +26,8 @@ stages:
           # Download artifact from the triggering build pipeline
           - task: DownloadBuildArtifacts@0
             inputs:
-              buildType: 'specific'
-              project: $(System.TeamProject)
-              pipeline: $(resources.pipeline.buildPipeline.runID)
-              artifactName: 'drop'
+              buildType: 'current'                     # <<< FIXED
+              artifactName: 'drop'                     # Your artifact name
               downloadPath: '$(System.ArtifactsDirectory)'
 
           # Unzip to IIS folder
