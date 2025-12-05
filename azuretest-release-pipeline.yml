@@ -5,7 +5,7 @@
   - deployment: DeployToVM
     displayName: "Deploy to Test IIS Server"
     pool:
-      name: 'Default'   # <-- IMPORTANT
+      name: 'default'   # <-- IMPORTANT
     environment: 'Test'
     strategy:
       runOnce:
