@@ -1,43 +1,32 @@
-# Do NOT trigger this pipeline on code push or PR
 trigger: none
 pr: none
 
-# Trigger this release automatically when the build pipeline finishes
 resources:
   pipelines:
-  - pipeline: buildPipeline        # alias
-    source: build                  # EXACT name of your build pipeline
-    trigger: true                  # auto-trigger release after build completes
+  - pipeline: buildPipeline
+    source: build
+    trigger: true
 
 stages:
 - stage: TestDeploy
   displayName: "Deploy to Test"
   jobs:
   - deployment: DeployToVM
-    displayName: "Deploy to Test IIS Server"
     pool:
-      name: 'Default'              # Your VM agent pool
+      name: 'Default'
     environment: 'Test'
     strategy:
       runOnce:
         deploy:
           steps:
 
-          # Download artifact from the triggering build pipeline
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: 'current'                     # <<< FIXED
-              artifactName: 'drop'                     # Your artifact name
-              downloadPath: '$(System.ArtifactsDirectory)'
-
-          # Unzip to IIS folder
+          # Extract the drop.zip Azure downloaded automatically
           - task: ExtractFiles@1
             inputs:
-              archiveFilePatterns: '$(System.ArtifactsDirectory)/drop/drop.zip'
+              archiveFilePatterns: '$(Pipeline.Workspace)/buildPipeline/drop/drop.zip'
               destinationFolder: 'C:\inetpub\wwwroot\c_sharp'
               cleanDestinationFolder: true
 
-          # Restart IIS
           - powershell: |
               iisreset
             displayName: "Restart IIS"
