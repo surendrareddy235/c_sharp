@@ -14,7 +14,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// ⭐ REQUIRED FOR HTML, CSS, JS, IMAGES ⭐
+// ⭐ REQUIRED FOR HTML, CSS, JS, IMAGES  ⭐
 app.UseStaticFiles();
 
 app.UseRouting();
