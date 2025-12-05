@@ -20,10 +20,10 @@ stages:
         deploy:
           steps:
 
-          # Extract the drop.zip Azure downloaded automatically ok 
+          # Extract drop.zip downloaded by Azure
           - task: ExtractFiles@1
             inputs:
-              archiveFilePatterns: '$(Pipeline.Workspace)/buildPipeline/drop/drop.zip'
+              archiveFilePatterns: '$(System.ArtifactsDirectory)/buildPipeline/drop/drop.zip'
               destinationFolder: 'C:\inetpub\wwwroot\c_sharp'
               cleanDestinationFolder: true
 
