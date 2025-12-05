@@ -20,25 +20,14 @@ stages:
         deploy:
           steps:
 
-          # Download build artifact from build pipeline
-          - task: DownloadBuildArtifacts@0
-            displayName: "Download s.zip"
-            inputs:
-              buildType: 'specific'
-              project: $(System.TeamProject)
-              pipeline: $(resources.pipeline.buildPipeline.runID)
-              artifactName: 'drop'
-              downloadPath: '$(Pipeline.Workspace)'   # <--- stable path, NOT temp CAC
-
-          # 2️ Extract s.zip directly into IIS folder
+          # Extract ONLY s.zip (Azure already downloaded artifact automatically)
           - task: ExtractFiles@1
-            displayName: "Extract s.zip to IIS"
+            displayName: "Extract s.zip into IIS"
             inputs:
-              archiveFilePatterns: '$(Pipeline.Workspace)/drop/s.zip'
+              archiveFilePatterns: '$(Pipeline.Workspace)/buildPipeline/drop/publish/s.zip'
               destinationFolder: 'C:\inetpub\wwwroot\c_sharp'
               cleanDestinationFolder: true
 
-          # 3️ Restart IIS
           - powershell: |
               iisreset
             displayName: "Restart IIS"
