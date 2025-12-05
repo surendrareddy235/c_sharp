@@ -1,11 +1,11 @@
-stages:
-
+# Trigger this release whenever the build pipeline completes
 resources:
   pipelines:
-  - pipeline: buildPipeline
-    source: azure-build-pipelines
+  - pipeline: buildPipeline        # alias you choose
+    source: azure-build-pipelines  # EXACT name of your build pipeline
     trigger: true
 
+stages:
 - stage: TestDeploy
   displayName: "Deploy to Test"
   jobs:
@@ -21,7 +21,9 @@ resources:
 
           - task: DownloadBuildArtifacts@0
             inputs:
-              buildType: 'current'
+              buildType: 'specific'
+              project: $(System.TeamProject)
+              pipeline: $(resources.pipeline.buildPipeline.runID)
               artifactName: 'drop'
               downloadPath: '$(System.ArtifactsDirectory)'
 
