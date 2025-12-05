@@ -22,10 +22,12 @@ stages:
 
           # Extract drop.zip downloaded by Azure
           - task: ExtractFiles@1
+            displayName: "Extract drop.zip"
             inputs:
-              archiveFilePatterns: '$(System.ArtifactsDirectory)/buildPipeline/drop/drop.zip'
+              archiveFilePatterns: '$(Pipeline.Workspace)/buildPipeline/drop/drop.zip'
               destinationFolder: 'C:\inetpub\wwwroot\c_sharp'
               cleanDestinationFolder: true
+
 
           - powershell: |
               iisreset
