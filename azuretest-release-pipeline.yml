@@ -1,32 +1,36 @@
+stages:
+
+resources:
+  pipelines:
+  - pipeline: buildPipeline
+    source: azure-build-pipelines
+    trigger: true
+
 - stage: TestDeploy
   displayName: "Deploy to Test"
-  dependsOn: Build
   jobs:
   - deployment: DeployToVM
     displayName: "Deploy to Test IIS Server"
     pool:
-      name: 'default'   # <-- IMPORTANT
+      name: 'Default'
     environment: 'Test'
     strategy:
       runOnce:
         deploy:
           steps:
 
-          # Download artifact
           - task: DownloadBuildArtifacts@0
             inputs:
               buildType: 'current'
               artifactName: 'drop'
               downloadPath: '$(System.ArtifactsDirectory)'
 
-          # Unzip to deploy folder
           - task: ExtractFiles@1
             inputs:
               archiveFilePatterns: '$(System.ArtifactsDirectory)/drop/drop.zip'
               destinationFolder: 'C:\inetpub\wwwroot\c_sharp'
               cleanDestinationFolder: true
 
-          # Restart IIS
           - powershell: |
               iisreset
             displayName: "Restart IIS"
