@@ -20,7 +20,7 @@ stages:
         deploy:
           steps:
 
-          # Extract the drop.zip Azure downloaded automatically
+          # Extract the drop.zip Azure downloaded automatically ok 
           - task: ExtractFiles@1
             inputs:
               archiveFilePatterns: '$(Pipeline.Workspace)/buildPipeline/drop/drop.zip'
