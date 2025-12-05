@@ -1,8 +1,12 @@
-# Trigger this release whenever the build pipeline completes
+# Do NOT trigger this pipeline on code push or PR
+trigger: none
+pr: none
+
+# Trigger this release automatically when the build pipeline finishes
 resources:
   pipelines:
-  - pipeline: buildPipeline        # alias you choose
-    source: azure-build-pipelines  # EXACT name of your build pipeline
+  - pipeline: buildPipeline        # alias (you can name anything)
+    source: build  # EXACT name of your build pipeline
     trigger: true
 
 stages:
@@ -12,13 +16,14 @@ stages:
   - deployment: DeployToVM
     displayName: "Deploy to Test IIS Server"
     pool:
-      name: 'Default'
-    environment: 'Test'
+      name: 'Default'              # Your VM agent pool
+    environment: 'Test'            # Your Environment name
     strategy:
       runOnce:
         deploy:
           steps:
 
+          # Download artifact from the triggering build pipeline
           - task: DownloadBuildArtifacts@0
             inputs:
               buildType: 'specific'
@@ -27,12 +32,14 @@ stages:
               artifactName: 'drop'
               downloadPath: '$(System.ArtifactsDirectory)'
 
+          # Unzip to IIS folder
           - task: ExtractFiles@1
             inputs:
               archiveFilePatterns: '$(System.ArtifactsDirectory)/drop/drop.zip'
               destinationFolder: 'C:\inetpub\wwwroot\c_sharp'
               cleanDestinationFolder: true
 
+          # Restart IIS
           - powershell: |
               iisreset
             displayName: "Restart IIS"
